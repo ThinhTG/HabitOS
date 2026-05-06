@@ -1,3 +1,29 @@
+server:
+  port: 8080
+
 spring:
   application:
-    name: api-gateway
+    name: API-GATEWAY
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: habit-service
+              uri: lb://HABIT-SERVICE
+              predicates:
+                - Path=/api/habits/**
+
+            - id: auth-service
+              uri: lb://AUTH-SERVICE
+              predicates:
+                - Path=/api/auths/**
+
+
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL}
