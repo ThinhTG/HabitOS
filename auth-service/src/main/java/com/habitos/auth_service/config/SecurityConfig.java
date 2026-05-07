@@ -32,7 +32,6 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> {})
         .authorizeHttpRequests(req -> req
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers(WHITE_LIST_URL).permitAll()
