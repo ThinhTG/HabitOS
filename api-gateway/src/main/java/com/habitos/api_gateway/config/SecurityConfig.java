@@ -24,6 +24,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
                         // Public endpoints
                         .pathMatchers("/api/auths/**").permitAll()
+                        .pathMatchers("/api/habits/**").permitAll()
                         // Secure everything else
                         .anyExchange().authenticated()
                 )
