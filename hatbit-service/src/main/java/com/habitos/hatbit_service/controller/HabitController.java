@@ -3,10 +3,10 @@ package com.habitos.hatbit_service.controller;
 import java.util.List;
 import java.util.UUID;
 
+import com.habitos.hatbit_service.config.SecurityUtils;
+import com.habitos.hatbit_service.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,61 +29,46 @@ import jakarta.validation.Valid;
 @Validated
 public class HabitController {
     private final HabitService habitService;
-    public HabitController(HabitService habitService) {
+    private final SecurityUtils securityUtils;
+
+    public HabitController(HabitService habitService, SecurityUtils securityUtils) {
         this.habitService = habitService;
+        this.securityUtils = securityUtils;
     }
 
     @PostMapping
-    public ResponseEntity<HabitResponse> createHabit(@Valid @RequestBody HabitCreateRequest request) {
-		UUID userId = resolveUserId();
+    public ResponseEntity<ApiResponse<HabitResponse>> createHabit(@Valid @RequestBody HabitCreateRequest request) {
+		UUID userId = securityUtils.getCurrentUserId();
 		HabitResponse response = habitService.createHabit(userId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(response));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<HabitResponse> getHabitById(@PathVariable UUID id) {
-        return ResponseEntity.ok(habitService.getHabitById(id));
+    public ResponseEntity<ApiResponse<HabitResponse>> getHabitById(@PathVariable UUID id) {
+        HabitResponse response = habitService.getHabitById(id);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @GetMapping
-        public ResponseEntity<List<HabitResponse>> getHabitsByUserId() {
-		UUID userId = resolveUserId();
-		return ResponseEntity.ok(habitService.getHabitsByUserId(userId));
+        public ResponseEntity<ApiResponse<List<HabitResponse>>> getHabitsByUserId() {
+		UUID userId = securityUtils.getCurrentUserId();
+        List<HabitResponse> response = habitService.getHabitsByUserId(userId);
+		return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<HabitResponse> updateHabit(
+    public ResponseEntity<ApiResponse<HabitResponse>> updateHabit(
             @PathVariable UUID id,
-            @RequestBody HabitUpdateRequest request
+            @Valid @RequestBody HabitUpdateRequest request
     ) {
-        return ResponseEntity.ok(habitService.updateHabit(id, request));
+        HabitResponse response = habitService.updateHabit(id, request);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteHabit(@PathVariable UUID id) {
         habitService.deleteHabit(id);
         return ResponseEntity.noContent().build();
-    }
-
-    private UUID resolveUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication.getPrincipal() == null) {
-            throw new org.springframework.web.server.ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Unauthorized"
-            );
-        }
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof UUID uuid) {
-            return uuid;
-        }
-        try {
-            return UUID.fromString(principal.toString());
-        } catch (IllegalArgumentException ex) {
-            throw new org.springframework.web.server.ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Invalid user"
-            );
-        }
     }
 }
