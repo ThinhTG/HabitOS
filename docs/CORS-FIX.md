@@ -35,6 +35,8 @@ Notes and next steps
 - For deployed frontend, set `CORS_ALLOWED_ORIGINS` in the API gateway environment to your frontend URL (comma-separated if multiple). Example:
    - `CORS_ALLOWED_ORIGINS=https://habitosfedeploy.vercel.app`
    - If you also want local dev: `CORS_ALLOWED_ORIGINS=http://localhost:5173,https://habitosfedeploy.vercel.app`
+- For Vercel preview URLs, set a wildcard pattern:
+   - `CORS_ALLOWED_ORIGIN_PATTERNS=https://*.vercel.app`
 - If you still see CORS errors after these changes, check whether frontend is calling the gateway directly or some other IP (search network tab). Also verify Docker/Nginx or a cloud load balancer isn't stripping CORS headers.
 - Optional: replace the CorsWebFilter.allowedOrigins with config-driven list or use `config.addAllowedOriginPattern("*")` if you must allow dynamic origins (but avoid wildcard with credentials enabled).
 
