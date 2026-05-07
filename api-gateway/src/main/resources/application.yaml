@@ -5,6 +5,12 @@ spring:
   application:
     name: API-GATEWAY
 
+app:
+  cors:
+    # Comma-separated list of frontend origins allowed to access the gateway
+    # Override with environment variable CORS_ALLOWED_ORIGINS
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,https://habitosfedeploy.vercel.app}
+
   cloud:
     gateway:
       server:
