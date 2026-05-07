@@ -1,5 +1,4 @@
-package com.habitos.auth_service.config;
-
+package com.habitos.api_gateway.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
