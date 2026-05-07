@@ -37,6 +37,7 @@ Notes and next steps
    - If you also want local dev: `CORS_ALLOWED_ORIGINS=http://localhost:5173,https://habitosfedeploy.vercel.app`
 - For Vercel preview URLs, set a wildcard pattern:
    - `CORS_ALLOWED_ORIGIN_PATTERNS=https://*.vercel.app`
+- If your reverse proxy routes `/api/habits` directly to habit-service (bypassing the gateway), the habit-service must also have the same CORS settings. This is now supported via the same env vars in `hatbit-service`.
 - If you still see CORS errors after these changes, check whether frontend is calling the gateway directly or some other IP (search network tab). Also verify Docker/Nginx or a cloud load balancer isn't stripping CORS headers.
 - Optional: replace the CorsWebFilter.allowedOrigins with config-driven list or use `config.addAllowedOriginPattern("*")` if you must allow dynamic origins (but avoid wildcard with credentials enabled).
 
