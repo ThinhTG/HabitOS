@@ -14,8 +14,11 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @Configuration
 public class CorsConfig {
 
-        @Value("${app.cors.allowed-origins:http://localhost:5173}")
-        private String allowedOrigins;
+                @Value("${app.cors.allowed-origins:http://localhost:5173}")
+                private String allowedOrigins;
+
+                @Value("${app.cors.allowed-origin-patterns:}")
+                private String allowedOriginPatterns;
 
     @Bean
     public CorsWebFilter corsWebFilter() {
@@ -28,9 +31,21 @@ public class CorsConfig {
                 .filter(origin -> !origin.isBlank())
                 .toList();
 
-        config.setAllowedOrigins(origins.isEmpty()
-                ? List.of("http://localhost:5173")
-                : origins);
+        if (!origins.isEmpty()) {
+            config.setAllowedOrigins(origins);
+        } else {
+            config.setAllowedOrigins(List.of("http://localhost:5173"));
+        }
+
+        // Optional wildcard patterns (comma-separated), e.g. https://*.vercel.app
+        List<String> patterns = Arrays.stream(allowedOriginPatterns.split(","))
+                .map(String::trim)
+                .filter(pattern -> !pattern.isBlank())
+                .toList();
+
+        if (!patterns.isEmpty()) {
+            config.setAllowedOriginPatterns(patterns);
+        }
 
         // Allow all headers
         config.setAllowedHeaders(List.of("*"));
