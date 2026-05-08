@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.habitos.hatbit_service.common.PageResponse;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -68,4 +70,24 @@ public class HabitServiceImpl implements HabitService {
 		habit.setUpdated_at(LocalDateTime.now());
 		habitRepository.save(habit);
 	}
+
+    @Override
+    public PageResponse<HabitResponse> getUserHabits(UUID userId, int offset, int limit) {
+        int page = offset / limit;
+        var pageable = PageRequest.of(page, limit);
+
+        var habitPage = habitRepository.findByUserId(userId, pageable);
+
+        var items = habitPage.getContent()
+                .stream()
+                .map(habitMapper::toResponse)
+                .toList();
+
+        return new PageResponse<>(
+                items,
+                offset,
+                limit,
+                habitPage.getTotalElements()
+        );
+    }
 }
