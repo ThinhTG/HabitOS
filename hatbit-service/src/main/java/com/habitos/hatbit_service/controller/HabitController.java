@@ -3,19 +3,14 @@ package com.habitos.hatbit_service.controller;
 import java.util.List;
 import java.util.UUID;
 
+import com.habitos.hatbit_service.common.Page;
+import com.habitos.hatbit_service.common.PageResponse;
 import com.habitos.hatbit_service.config.SecurityUtils;
 import com.habitos.hatbit_service.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.habitos.hatbit_service.dto.request.HabitCreateRequest;
 import com.habitos.hatbit_service.dto.request.HabitUpdateRequest;
@@ -38,8 +33,8 @@ public class HabitController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<HabitResponse>> createHabit(@Valid @RequestBody HabitCreateRequest request) {
-		UUID userId = securityUtils.getCurrentUserId();
-		HabitResponse response = habitService.createHabit(userId, request);
+        UUID userId = securityUtils.getCurrentUserId();
+        HabitResponse response = habitService.createHabit(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response));
     }
@@ -51,10 +46,10 @@ public class HabitController {
     }
 
     @GetMapping
-        public ResponseEntity<ApiResponse<List<HabitResponse>>> getHabitsByUserId() {
-		UUID userId = securityUtils.getCurrentUserId();
+    public ResponseEntity<ApiResponse<List<HabitResponse>>> getHabitsByUserId() {
+        UUID userId = securityUtils.getCurrentUserId();
         List<HabitResponse> response = habitService.getHabitsByUserId(userId);
-		return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PutMapping("/{id}")
@@ -71,4 +66,24 @@ public class HabitController {
         habitService.deleteHabit(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/paging")
+    public ResponseEntity<ApiResponse<PageResponse<HabitResponse>>> getHabits(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "20") int limit
+    ) {
+
+        Page page = new Page(offset, limit);
+
+        UUID currentUserId = securityUtils.getCurrentUserId();
+
+        return ResponseEntity.ok(ApiResponse.success(habitService.getUserHabits(
+                currentUserId,
+                page.getOffset(),
+                page.getLimit()
+        )));
+    }
 }
+
+
+
