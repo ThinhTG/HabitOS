@@ -38,6 +38,10 @@ public class Habit {
     @Enumerated(EnumType.STRING)
     private Frequency frequency;   //DAILY | WEEKLY | CUSTOM
     private String frequency_days; // nếu CUSTOM (frequency) thì chọn ngày trong tuaan
+    // dành cho COUNT/TIME habits
+    private Integer value;    // nếu là BINARY ( 1 LÀ LÀM RỒI , 0 LÀ CHƯA LÀM)
+                                // NẾU LÀ COUNT ( VALUE là số lần)
+                                // nếu là Time (Value là số phút)
     // giao diện
     private String icon;
     private String colour;
